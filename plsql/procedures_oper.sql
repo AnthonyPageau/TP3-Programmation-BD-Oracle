@@ -59,3 +59,33 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Erreur ajouter_projet : ' || SQLERRM);
         ROLLBACK;
 END;
+
+-- AFFECTER_EQUIPEMENT
+
+CREATE OR REPLACE PROCEDURE affecter_equipement(
+    p_id_projet     IN NUMBER,
+    p_id_equipement IN NUMBER,
+    p_date_affect   IN DATE,
+    p_duree_jours   IN NUMBER
+) AS
+    v_disponible NUMBER;
+BEGIN
+    v_disponible := verifier_disponibilite_equipement(p_id_equipement);
+
+    IF v_disponible = 0 THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Equipement non disponible');
+    END IF;
+
+    INSERT INTO AFFECTATION_EQUIP(id_projet, id_equipement, date_affectation, duree_jours)
+    VALUES (p_id_projet, p_id_equipement, p_date_affect, p_duree_jours);
+
+    COMMIT;
+
+    journaliser_action('AFFECTATION_EQUIP', 'INSERT', USER,
+        'Affectation equipement ' || p_id_equipement || ' au projet ' || p_id_projet);
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur affecter_equipement : ' || SQLERRM);
+        ROLLBACK;
+END;
