@@ -16,7 +16,6 @@ BEGIN
 END;
 /
 
-
 -- ========================
 -- TRG_AFFECTATION_BEFORE_INSERT
 -- ========================

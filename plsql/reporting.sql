@@ -9,12 +9,12 @@ IS
     v_budget_total NUMBER := 0;
 BEGIN
     FOR projet_rec IN (SELECT id_projet, titre, domaine, budget
-                       FROM PROJET
-                       WHERE id_chercheur_resp = p_id_chercheur)
+        FROM PROJET
+        WHERE id_chercheur_resp = p_id_chercheur)
     LOOP
         DBMS_OUTPUT.PUT_LINE('Projet : ' || projet_rec.titre || 
-                             ' | Domaine : ' || projet_rec.domaine || 
-                             ' | Budget : ' || projet_rec.budget);
+            ' | Domaine : ' || projet_rec.domaine || 
+            ' | Budget : ' || projet_rec.budget);
         v_budget_total := v_budget_total + projet_rec.budget;
     END LOOP;
 
@@ -44,8 +44,8 @@ IS
     v_result t_budget_domaine_table := t_budget_domaine_table();
 BEGIN
     FOR r IN (SELECT domaine, AVG(budget) AS budget_moyen
-              FROM PROJET
-              GROUP BY domaine)
+        FROM PROJET
+        GROUP BY domaine)
     LOOP
         v_result.EXTEND;
         v_result(v_result.COUNT) := t_budget_domaine(r.domaine, r.budget_moyen);
