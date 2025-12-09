@@ -64,3 +64,32 @@ BEGIN
     WHERE id_equipement = :OLD.id_equipement;
 END;
 /
+
+-- ========================
+-- TRG_EXPERIENCE_AFTER_INSERT
+-- ========================
+CREATE OR REPLACE TRIGGER trg_experience_after_insert
+AFTER INSERT ON EXPERIENCE
+FOR EACH ROW
+BEGIN
+    INSERT INTO LOG_OPERATION(table_concernee, operation, utilisateur, description)
+    VALUES (
+        'EXPERIENCE',
+        'INSERT',
+        USER,
+        'Nouvelle expérience ' || :NEW.id_exp || 
+        ' pour le projet projet ' || :NEW.id_projet
+    );
+END;
+/
+
+-- ========================
+-- TRG_CHERCHEUR_CRYPTER_NOM
+-- ========================
+CREATE OR REPLACE TRIGGER trg_chercheur_crypter_nom
+BEFORE INSERT OR UPDATE ON CHERCHEUR
+FOR EACH ROW
+BEGIN
+    :NEW.nom := crypter_champs(:NEW.nom);
+END;
+/

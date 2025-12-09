@@ -1,4 +1,6 @@
+-- ========================
 -- VERIFIER_DISPONIBILITE_EQUIPMENT
+-- ========================
 
 CREATE OR REPLACE FUNCTION verifier_disponibilite_equipement(p_id_equipement NUMBER)
 RETURN NUMBER
@@ -23,7 +25,9 @@ EXCEPTION
         RAISE;
 END verifier_disponibilite_equipement;
 
+-- ========================
 -- MOYENNE_MESURES_EXPERIENCE
+-- ========================
 
 CREATE FUNCTION moyenne_mesures_experience(p_id_experience NUMBER)
 RETURN NUMBER
@@ -50,4 +54,34 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE;
 END moyenne_mesures_experience;
+/
+
+-- ========================
+-- CRYPTER_CHAMPS
+-- ========================
+CREATE OR REPLACE FUNCTION crypter_champs(p_val VARCHAR2)
+RETURN VARCHAR2
+IS
+BEGIN
+    RETURN UTL_RAW.cast_to_varchar2(
+        UTL_ENCODE.base64_encode(
+            UTL_RAW.cast_to_raw(p_val)
+        )
+    );
+END;
+/
+
+-- ========================
+-- DECRYPTER_CHAMPS
+-- ========================
+CREATE OR REPLACE FUNCTION decrypter_champs(p_val VARCHAR2)
+RETURN VARCHAR2
+IS
+BEGIN
+    RETURN UTL_RAW.cast_to_varchar2(
+        UTL_ENCODE.base64_decode(
+            UTL_RAW.cast_to_raw(p_val)
+        )
+    );
+END;
 /
