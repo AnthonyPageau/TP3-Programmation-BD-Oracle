@@ -1,6 +1,14 @@
 -- ========================
 --JOURNALISER_ACTION
 -- ========================
+-- Objectif: Permet d'enregistrer toutes les opérations (INSERT, UPDATE, DELETE)
+-- Paramètres:
+    -- p_table_concernee : Nom de la table
+    -- p_operation       : Opération faite (INSERT, UPDATE, DELETE)
+    -- p_utilisateur     : Le nom de l'utilisateur qui fait l'action
+    -- p_description     : Description de l'opération
+-- Exceptions:
+    -- Toutes les erreurs font un rollback
 
 CREATE OR REPLACE PROCEDURE journaliser_action(
     p_table_concernee IN VARCHAR2,
@@ -22,6 +30,18 @@ END;
 -- ========================
 --AJOUTER_PROJET
 -- ========================
+-- Objectif: Ajouter un nouveau projet
+-- Paramètres:
+    -- p_titre: Titre du projet
+    -- p_domaine: Domaine scientifique du projet
+    -- p_budget: Budget du projet
+    -- p_date_debut: Date de début du projet
+    -- p_date_fin: Date de fin du projet
+    -- p_id_chercheur_resp: Identifiant du chercheur
+-- Exceptions:
+    -- -20004 : Chercheur inexistant
+    -- -20005 : Le chercheur a déjà 3 projets
+    --  Les autres erreurs entraînent un ROLLBACK
 
 CREATE OR REPLACE PROCEDURE ajouter_projet(
     p_titre            IN VARCHAR2,
@@ -67,6 +87,15 @@ END;
 -- ========================
 -- AFFECTER_EQUIPEMENT
 -- ========================
+-- Objectif: Associer un équipement disponible à un projet
+-- Paramètres:
+    -- p_id_projet: Identifiant du projet
+    -- p_id_equipement: Identifiant du projet
+    -- p_date_affect: Date de début de l'affectation
+    -- p_duree_jours: Durée de l'affection de l'équipement au projet
+-- Exceptions:
+    -- -20006 : Équipement indisponible
+    --  Les autres erreurs entraînent un ROLLBACK
 
 CREATE OR REPLACE PROCEDURE affecter_equipement(
     p_id_projet     IN NUMBER,
