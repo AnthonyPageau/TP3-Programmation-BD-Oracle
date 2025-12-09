@@ -6,7 +6,8 @@
 
 ## Répartition des tâches
 
-### Script de création - **ANTHONY PAGEAU**
+### Script de création 
+- **ANTHONY PAGEAU**
 
 ### Procédures opérationnelles
 - `ajouter_projet` — **ANTHONY PAGEAU**
@@ -69,7 +70,7 @@
 ### 6. Blocs de test
 - @tests/tests_blocs.sql
 
-### Date de remis
+### Date de remise
 - 12 décembre 2025
 
 ### État du projet
