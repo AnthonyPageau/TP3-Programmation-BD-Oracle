@@ -21,7 +21,7 @@ BEFORE INSERT OR UPDATE ON CHERCHEUR
 FOR EACH ROW
 BEGIN
   IF :NEW.date_embauche > SYSDATE THEN
-    RAISE_APPLICATION_ERROR(-20001, 'La date de embauche ne peut pas être future.');
+    RAISE_APPLICATION_ERROR(-20010, 'La date de embauche ne peut pas être future.');
   END IF;
 END;
 /
@@ -70,7 +70,7 @@ BEFORE INSERT OR UPDATE ON EQUIPEMENT
 FOR EACH ROW
 BEGIN
   IF :NEW.date_acquisition > SYSDATE THEN
-    RAISE_APPLICATION_ERROR(-20002, 'La date de acquisition ne peut pas être future.');
+    RAISE_APPLICATION_ERROR(-20011, 'La date de acquisition ne peut pas être future.');
   END IF;
 END;
 /

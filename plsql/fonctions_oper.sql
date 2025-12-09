@@ -44,7 +44,7 @@ BEGIN
 
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        RAISE_APPLICATION_ERROR(-20001,
+        RAISE_APPLICATION_ERROR(-20003,
             'Expérience inconnue : ' || p_id_experience);
 
     WHEN OTHERS THEN

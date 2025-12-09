@@ -19,36 +19,6 @@ EXCEPTION
         ROLLBACK;
 END;
 
--- BLOC DE TEST
-
-DECLARE
-    v_count_before NUMBER;
-    v_count_after  NUMBER;
-BEGIN
-    SELECT COUNT(*) INTO v_count_before FROM LOG_OPERATION;
-
-    journaliser_action(
-        p_table_concernee => 'TABLE_CONCERNEE',
-        p_operation       => 'INSERT',
-        p_utilisateur     => USER,
-        p_description     => 'Test de journalisation'
-    );
-
-    SELECT COUNT(*) INTO v_count_after FROM LOG_OPERATION;
-
-    IF v_count_after = v_count_before + 1 THEN
-        DBMS_OUTPUT.PUT_LINE('TEST journaliser_action : OK');
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('TEST journaliser_action : ÉCHEC');
-    END IF;
-
-    DELETE FROM LOG_OPERATION
-    WHERE description = 'Test de journalisation';
-
-    COMMIT;
-END;
-/
-
 -- ========================
 --AJOUTER_PROJET
 -- ========================
@@ -68,7 +38,7 @@ BEGIN
     WHERE id_chercheur = p_id_chercheur_resp;
 
     IF v_count = 0 THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Chercheur responsable inexistant');
+        RAISE_APPLICATION_ERROR(-20004, 'Chercheur responsable inexistant');
     END IF;
 
     SELECT COUNT(*) INTO v_count
@@ -78,7 +48,7 @@ BEGIN
            OR p_date_fin BETWEEN date_debut AND date_fin);
 
     IF v_count >= 3 THEN
-        RAISE_APPLICATION_ERROR(-20002, 'Le chercheur a déjà 3 projets');
+        RAISE_APPLICATION_ERROR(-20005, 'Le chercheur a déjà 3 projets');
     END IF;
 
     INSERT INTO PROJET(titre, domaine, budget, date_debut, date_fin, id_chercheur_resp)
@@ -93,33 +63,6 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Erreur ajouter_projet : ' || SQLERRM);
         ROLLBACK;
 END;
-
--- BLOC DE TEST
-
-DECLARE
-    v_id_chercheur NUMBER;
-BEGIN
-    INSERT INTO CHERCHEUR(nom, prenom, specialite, date_embauche)
-    VALUES ('Test', 'Test', 'Test', SYSDATE - 30)
-    RETURNING id_chercheur INTO v_id_chercheur;
-
-    ajouter_projet(
-        p_titre             => 'Test',
-        p_domaine           => 'Test',
-        p_budget            => 50000,
-        p_date_debut        => SYSDATE,
-        p_date_fin          => SYSDATE + 20,
-        p_id_chercheur_resp => v_id_chercheur
-    );
-
-    DBMS_OUTPUT.PUT_LINE('TEST ajouter_projet : OK');
-
-    DELETE FROM PROJET WHERE titre = 'Test';
-    DELETE FROM CHERCHEUR WHERE id_chercheur = v_id_chercheur;
-
-    COMMIT;
-END;
-/
 
 -- ========================
 -- AFFECTER_EQUIPEMENT
@@ -136,7 +79,7 @@ BEGIN
     v_disponible := verifier_disponibilite_equipement(p_id_equipement);
 
     IF v_disponible = 0 THEN
-        RAISE_APPLICATION_ERROR(-20003, 'Equipement indisponible');
+        RAISE_APPLICATION_ERROR(-20006, 'Equipement indisponible');
     END IF;
 
     INSERT INTO AFFECTATION_EQUIP(id_projet, id_equipement, date_affectation, duree_jours)
@@ -153,38 +96,3 @@ EXCEPTION
         ROLLBACK;
 END;
 
--- BLOC DE TEST
-
-DECLARE
-    v_id_projet     NUMBER;
-    v_id_chercheur  NUMBER;
-    v_id_equipement NUMBER;
-BEGIN
-    INSERT INTO CHERCHEUR(nom, prenom, specialite, date_embauche)
-    VALUES ('Test', 'Test', 'Test', SYSDATE - 50)
-    RETURNING id_chercheur INTO v_id_chercheur;
-
-    INSERT INTO PROJET(titre, domaine, budget, date_debut, date_fin, id_chercheur_resp)
-    VALUES ('Test', 'Test', 20000, SYSDATE - 1, SYSDATE + 1, v_id_chercheur)
-    RETURNING id_projet INTO v_id_projet;
-
-    INSERT INTO EQUIPEMENT(nom, categorie, date_acquisition, etat)
-    VALUES ('Test', 'Test', SYSDATE - 1, 'Disponible')
-    RETURNING id_equipement INTO v_id_equipement;
-
-    affecter_equipement(
-        p_id_projet     => v_id_projet,
-        p_id_equipement => v_id_equipement,
-        p_date_affect   => SYSDATE,
-        p_duree_jours   => 5
-    );
-
-    DBMS_OUTPUT.PUT_LINE('TEST affecter_equipement : OK');
-
-    DELETE FROM AFFECTATION_EQUIP WHERE id_projet = v_id_projet;
-    DELETE FROM EQUIPEMENT WHERE id_equipement = v_id_equipement;
-    DELETE FROM PROJET WHERE id_projet = v_id_projet;
-    DELETE FROM CHERCHEUR WHERE id_chercheur = v_id_chercheur;
-
-    COMMIT;
-END;
