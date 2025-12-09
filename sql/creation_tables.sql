@@ -1,4 +1,7 @@
+-- ========================
 -- TABLE CHERCHEUR
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE CHERCHEUR CASCADE CONSTRAINTS';
 EXCEPTION
@@ -15,18 +18,10 @@ CREATE TABLE CHERCHEUR (
     date_embauche DATE
 );
 
--- Trigger pour contrôler date_embauche
-CREATE OR REPLACE TRIGGER trg_chercheur_date
-BEFORE INSERT OR UPDATE ON CHERCHEUR
-FOR EACH ROW
-BEGIN
-  IF :NEW.date_embauche > SYSDATE THEN
-    RAISE_APPLICATION_ERROR(-20010, 'La date de embauche ne peut pas être future.');
-  END IF;
-END;
-/
-
+-- ========================
 -- TABLE PROJET
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE PROJET CASCADE CONSTRAINTS';
 EXCEPTION
@@ -47,7 +42,10 @@ CREATE TABLE PROJET (
     CONSTRAINT chk_date_fin CHECK (date_fin >= date_debut)
 );
 
+-- ========================
 -- TABLE EQUIPEMENT
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE EQUIPEMENT CASCADE CONSTRAINTS';
 EXCEPTION
@@ -64,18 +62,10 @@ CREATE TABLE EQUIPEMENT (
     etat VARCHAR2(20) NOT NULL CHECK (etat IN ('Disponible','En maintenance','Hors service'))
 );
 
--- Trigger pour contrôler date_acquisition <= SYSDATE
-CREATE OR REPLACE TRIGGER trg_equipement_date
-BEFORE INSERT OR UPDATE ON EQUIPEMENT
-FOR EACH ROW
-BEGIN
-  IF :NEW.date_acquisition > SYSDATE THEN
-    RAISE_APPLICATION_ERROR(-20011, 'La date de acquisition ne peut pas être future.');
-  END IF;
-END;
-/
-
+-- ========================
 -- TABLE AFFECTATION_EQUIP
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE AFFECTATION_EQUIP CASCADE CONSTRAINTS';
 EXCEPTION
@@ -94,7 +84,10 @@ CREATE TABLE AFFECTATION_EQUIP (
     CONSTRAINT fk_affect_equip FOREIGN KEY (id_equipement) REFERENCES EQUIPEMENT(id_equipement)
 );
 
+-- ========================
 -- TABLE EXPERIENCE
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE EXPERIENCE CASCADE CONSTRAINTS';
 EXCEPTION
@@ -113,7 +106,10 @@ CREATE TABLE EXPERIENCE (
     CONSTRAINT fk_exp_projet FOREIGN KEY (id_projet) REFERENCES PROJET(id_projet)
 );
 
+-- ========================
 -- TABLE ECHANTILLON
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE ECHANTILLON CASCADE CONSTRAINTS';
 EXCEPTION
@@ -131,7 +127,10 @@ CREATE TABLE ECHANTILLON (
     CONSTRAINT fk_echantillon_exp FOREIGN KEY (id_exp) REFERENCES EXPERIENCE(id_exp)
 );
 
+-- ========================
 -- TABLE LOG_OPERATION
+-- ========================
+
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE LOG_OPERATION CASCADE CONSTRAINTS';
 EXCEPTION
