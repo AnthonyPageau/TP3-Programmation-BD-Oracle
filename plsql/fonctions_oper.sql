@@ -1,4 +1,32 @@
 -- ========================
+-- CALCULER_DUREE_PROJET
+-- ========================
+
+CREATE OR REPLACE FUNCTION calculer_duree_projet(p_id_projet NUMBER)
+RETURN NUMBER
+IS
+    v_date_debut DATE;
+    v_date_fin DATE;
+BEGIN
+    SELECT date_debut, date_fin
+    INTO v_date_debut, v_date_fin
+    FROM PROJET
+    WHERE id_projet = p_id_projet;
+
+    RETURN v_date_fin - v_date_debut;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20004, 'Projet inexistant : ' || p_id_projet);
+    WHEN OTHERS THEN
+        RAISE;
+
+END calculer_duree_projet;
+/
+
+
+
+-- ========================
 -- VERIFIER_DISPONIBILITE_EQUIPMENT
 -- ========================
 
@@ -24,6 +52,7 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE;
 END verifier_disponibilite_equipement;
+/
 
 -- ========================
 -- MOYENNE_MESURES_EXPERIENCE
@@ -50,6 +79,7 @@ EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20003,
             'Expérience inconnue : ' || p_id_experience);
+
 
     WHEN OTHERS THEN
         RAISE;
