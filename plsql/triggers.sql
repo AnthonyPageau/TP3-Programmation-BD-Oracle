@@ -93,3 +93,23 @@ BEGIN
     :NEW.nom := crypter_champs(:NEW.nom);
 END;
 /
+
+
+-- ========================
+-- TRG_ECHANTILLON_BEFORE_INSERT
+-- ========================
+CREATE OR REPLACE TRIGGER trg_echantillon_before_insert
+BEFORE INSERT ON ECHANTILLON
+FOR EACH ROW
+DECLARE
+    v_date_realisation EXPERIENCE.date_realisation%TYPE;
+BEGIN
+    SELECT date_realisation INTO v_date_realisation
+    FROM EXPERIENCE
+    WHERE id_exp = :NEW.id_exp;
+
+    IF :NEW.date_prelevement < v_date_realisation THEN
+        RAISE_APPLICATION_ERROR(-20110, 'date_prelevement doit être >= date_realisation.');
+    END IF;
+END;
+/
