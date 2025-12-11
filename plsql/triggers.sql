@@ -113,3 +113,17 @@ BEGIN
     END IF;
 END;
 /
+
+
+-- ========================
+-- TRG_LOG_BEFORE_INSERT
+-- ========================
+CREATE OR REPLACE TRIGGER trg_log_before_insert
+BEFORE INSERT ON LOG_OPERATION
+FOR EACH ROW
+BEGIN
+    :NEW.operation := UPPER(:NEW.operation);
+END;
+/
+
+
