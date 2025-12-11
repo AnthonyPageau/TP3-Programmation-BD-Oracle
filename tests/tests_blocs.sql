@@ -97,3 +97,75 @@ BEGIN
     COMMIT;
 END;
 /
+
+
+-- ========================
+-- TEST SUPPRIMER_PROJET
+-- ========================
+
+DECLARE
+    v_id_chercheur  NUMBER;
+    v_id_projet     NUMBER;
+    v_id_exp        NUMBER;
+    v_id_equip      NUMBER;
+    v_count         NUMBER;
+BEGIN
+
+    INSERT INTO CHERCHEUR(nom, prenom, specialite, date_embauche)
+    VALUES ('TestSuppr3', 'Test', 'IA', SYSDATE)
+    RETURNING id_chercheur INTO v_id_chercheur;
+
+    INSERT INTO PROJET(titre, domaine, budget, date_debut, date_fin, id_chercheur_resp)
+    VALUES ('ProjetSuppr3', 'IA', 10000, SYSDATE - 1, SYSDATE + 5, v_id_chercheur)
+    RETURNING id_projet INTO v_id_projet;
+
+    INSERT INTO EXPERIENCE(id_projet, titre_exp, date_realisation, statut)
+    VALUES (v_id_projet, 'ExpTest3', SYSDATE, 'En cours')
+    RETURNING id_exp INTO v_id_exp;
+
+    INSERT INTO ECHANTILLON(id_exp, type_echantillon, date_prelevement, mesure)
+    VALUES (v_id_exp, 'TestType3', SYSDATE, 1);
+
+    INSERT INTO EQUIPEMENT(nom, categorie, date_acquisition, etat)
+    VALUES ('EquipSupprTest3', 'Test', SYSDATE - 1, 'Disponible')
+    RETURNING id_equipement INTO v_id_equip;
+
+    affecter_equipement(v_id_projet, v_id_equip, SYSDATE, 10);
+
+    COMMIT;
+
+    supprimer_projet(v_id_projet);
+
+    SELECT COUNT(*) INTO v_count FROM PROJET WHERE id_projet = v_id_projet;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Projet supprimé : OK');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Projet supprimé : ÉCHEC');
+    END IF;
+
+    SELECT COUNT(*) INTO v_count FROM EXPERIENCE WHERE id_projet = v_id_projet;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Expériences supprimées : OK');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Expériences supprimées : ÉCHEC');
+    END IF;
+
+    SELECT COUNT(*) INTO v_count FROM ECHANTILLON WHERE id_exp = v_id_exp;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Échantillons supprimés : OK');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Échantillons supprimés : ÉCHEC');
+    END IF;
+
+    SELECT COUNT(*) INTO v_count FROM AFFECTATION_EQUIP WHERE id_projet = v_id_projet;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Affectations déquipements supprimées : OK');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Affectations déquipements supprimées : ÉCHEC');
+    END IF;
+
+    DELETE FROM EQUIPEMENT WHERE id_equipement = v_id_equip;
+
+    COMMIT;
+END;
+/
