@@ -26,6 +26,54 @@ EXCEPTION
 END rapport_projets_par_chercheur;
 
 
+-- RAPPORT_ACTIVITE_PROJETS
+
+CREATE OR REPLACE PROCEDURE rapport_activite_projets
+IS
+    v_nb_exp NUMBER;
+    v_nb_term NUMBER;
+    v_taux NUMBER;
+BEGIN
+    FOR p IN (SELECT id_projet, titre FROM PROJET)
+    LOOP
+        SELECT COUNT(*) INTO v_nb_exp
+        FROM EXPERIENCE
+        WHERE id_projet = p.id_projet;
+
+        SELECT COUNT(*) INTO v_nb_term
+        FROM EXPERIENCE
+        WHERE id_projet = p.id_projet
+          AND statut = 'Terminée';
+
+        IF v_nb_exp = 0 THEN
+            v_taux := 0;
+        ELSE
+            v_taux := (v_nb_term / v_nb_exp) * 100;
+        END IF;
+
+        DBMS_OUTPUT.PUT_LINE('Projet : ' || p.titre);
+        DBMS_OUTPUT.PUT_LINE('Expériences : ' || v_nb_exp);
+        DBMS_OUTPUT.PUT_LINE('Taux de réussite : ' || ROUND(v_taux, 2) || '%');
+
+        FOR e IN (
+            SELECT id_exp, titre_exp
+            FROM EXPERIENCE
+            WHERE id_projet = p.id_projet
+        )
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(
+                '   Exp ' || e.id_exp ||
+                ' (' || e.titre_exp || ') moyenne = ' ||
+                moyenne_mesures_experience(e.id_exp)
+            );
+        END LOOP;
+
+    END LOOP;
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur rapport_activite_projets : ' || SQLERRM);
+END rapport_activite_projets;
+/
 
 -- ========================
 -- FONCTION
