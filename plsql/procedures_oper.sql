@@ -125,3 +125,54 @@ EXCEPTION
         ROLLBACK;
 END;
 
+
+-- ========================
+-- SUPPRIMER_PROJET
+-- ========================
+-- Objectif:
+--     Supprimer complètement un projet et toutes ses dépendances associées :
+--         - Échantillons
+--         - Expériences
+--         - Affectations d'équipement
+--     Puis journaliser l’opération via la procédure journaliser_action.
+-- Paramètres:
+--     p_id_projet : Identifiant du projet à supprimer
+-- Exceptions:
+--     -20010 : Projet inexistant
+--     Les autres erreurs entraînent un ROLLBACK
+CREATE OR REPLACE PROCEDURE supprimer_projet(p_id_projet NUMBER)
+AS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM PROJET
+    WHERE id_projet = p_id_projet;
+
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20010, 'Projet introuvable : ' || p_id_projet);
+    END IF;
+
+    DELETE FROM ECHANTILLON
+    WHERE id_exp IN (
+        SELECT id_exp FROM EXPERIENCE WHERE id_projet = p_id_projet
+    );
+
+    DELETE FROM EXPERIENCE
+    WHERE id_projet = p_id_projet;
+
+    DELETE FROM AFFECTATION_EQUIP
+    WHERE id_projet = p_id_projet;
+
+    DELETE FROM PROJET
+    WHERE id_projet = p_id_projet;
+
+    COMMIT;
+
+    journaliser_action('PROJET', 'DELETE', USER, 'Suppression du projet ' || p_id_projet);
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur supprimer_projet : ' || SQLERRM);
+        ROLLBACK;
+END;
+
