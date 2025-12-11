@@ -127,3 +127,19 @@ END;
 /
 
 
+-- ========================
+-- TRG_SECURITE_AFTER_UPDATE
+-- ========================
+CREATE OR REPLACE TRIGGER trg_securite_after_update
+AFTER UPDATE ON CHERCHEUR
+FOR EACH ROW
+BEGIN
+    INSERT INTO LOG_OPERATION(table_concernee,operation,utilisateur,description)
+    VALUES (
+        'CHERCHEUR',
+        'UPDATE',
+        USER,
+        'Modification du chercheur ID=' || :OLD.id_chercheur
+    );
+END;
+/
