@@ -25,6 +25,8 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Erreur rapport_projets_par_chercheur : ' || SQLERRM);
 END rapport_projets_par_chercheur;
 
+
+
 -- ========================
 -- FONCTION
 -- ========================
@@ -53,3 +55,37 @@ BEGIN
 
     RETURN v_result;
 END budget_moyen_par_domaine;
+
+
+-- STATISTIQUES_EQUIPEMENTS
+
+CREATE OR REPLACE TYPE t_stat_equip AS OBJECT (
+    etat VARCHAR2(20),
+    total NUMBER
+);
+
+CREATE OR REPLACE TYPE t_stat_equip_table AS TABLE OF t_stat_equip;
+
+CREATE OR REPLACE FUNCTION statistiques_equipements
+RETURN t_stat_equip_table
+IS
+    v_result t_stat_equip_table := t_stat_equip_table();
+    v_dispo NUMBER := 0;
+    v_occupe NUMBER := 0;
+BEGIN
+    SELECT COUNT(*) INTO v_dispo
+    FROM EQUIPEMENT
+    WHERE etat = 'Disponible';
+
+    SELECT COUNT(*) INTO v_occupe
+    FROM AFFECTATION_EQUIP
+    WHERE date_affectation + duree_jours >= SYSDATE;
+
+    v_result.EXTEND;
+    v_result(v_result.COUNT) := t_stat_equip('Disponible', v_dispo);
+
+    v_result.EXTEND;
+    v_result(v_result.COUNT) := t_stat_equip('Occupé', v_occupe);
+
+    RETURN v_result;
+END statistiques_equipements;
